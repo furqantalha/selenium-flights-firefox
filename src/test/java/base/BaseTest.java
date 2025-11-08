@@ -17,14 +17,14 @@ public class BaseTest {
         WebDriverManager.firefoxdriver().setup();
 
         FirefoxOptions options = new FirefoxOptions();
-        // 👇 Set Firefox binary path manually
+        // Set Firefox binary path manually
         options.setBinary("C:\\Program Files\\Mozilla Firefox\\firefox.exe");
 
         driver = new FirefoxDriver(options);
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(15));
         driver.manage().window().maximize();
 
-        System.out.println("🚀 Firefox launched successfully!");
+        System.out.println("Firefox launched successfully!");
     }
 
    /* @AfterMethod

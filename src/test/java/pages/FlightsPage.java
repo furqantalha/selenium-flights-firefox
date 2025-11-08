@@ -33,9 +33,9 @@ public class FlightsPage {
             Thread.sleep(1000);
             input.sendKeys(Keys.ARROW_DOWN);
             input.sendKeys(Keys.ENTER);
-            System.out.println("✅ From City entered: " + city);
+            System.out.println("From City entered: " + city);
         } catch (Exception e) {
-            System.out.println("⚠️ Failed to enter From City: " + e.getMessage());
+            System.out.println("Failed to enter From City: " + e.getMessage());
         }
     }
 
@@ -47,143 +47,127 @@ public class FlightsPage {
             Thread.sleep(1000);
             input.sendKeys(Keys.ARROW_DOWN);
             input.sendKeys(Keys.ENTER);
-            System.out.println("✅ To City entered: " + city);
+            System.out.println("To City entered: " + city);
         } catch (Exception e) {
-            System.out.println("⚠️ Failed to enter To City: " + e.getMessage());
+            System.out.println(" Failed to enter To City: " + e.getMessage());
         }
     }
 
 
-    public void selectLowestFareDate() {
+    public void selectDateByIndex(int index) {
         try {
-            // 1️⃣ Open the calendar
+            // Open the calendar
             WebElement calInput = wait.until(ExpectedConditions.elementToBeClickable(calendarInput));
             calInput.click();
 
-            // 2️⃣ Click the Next Month button (arrow)
+            // Click next month
             By nextMonthButton = By.xpath("/html/body/div/div/div[2]/div[1]/div/div[2]/div/div[2]/form/div/div[3]/div[1]/div[2]/div/div/div/div/table[2]/thead/tr[1]/th[3]/div/button");
             WebElement nextBtn = wait.until(ExpectedConditions.elementToBeClickable(nextMonthButton));
             nextBtn.click();
 
-            // 3️⃣ Wait for next month to load
+            //  Wait for calendar update
             Thread.sleep(1500);
-            // Wait until some date buttons are visible
 
-            wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("button.pl8ttv")));
-            List<WebElement> buttons = driver.findElements(By.cssSelector("button.pl8ttv"));
+            //  Collect all date buttons
+            List<WebElement> dateButtons = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("button.pl8ttv")));
 
-            int lowestFare = Integer.MAX_VALUE;
-            WebElement lowestButton = null;
-
-            for (WebElement btn : buttons) {
-                try {
-                    WebElement priceDiv = btn.findElement(By.cssSelector("div.tmT\\+ZQ"));
-                    String text = priceDiv.getText().replaceAll("[^0-9]", "");
-                    if (!text.isEmpty()) {
-                        int fare = Integer.parseInt(text);
-                        if (fare < lowestFare) {
-                            lowestFare = fare;
-                            lowestButton = btn;
-                        }
-                    }
-                } catch (Exception e) {
-                    // ignore invalid buttons
-                }
+            //  Validate index range
+            if (index <= 0 || index > dateButtons.size()) {
+                System.out.println("Invalid index. Calendar only has " + dateButtons.size() + " days.");
+                return;
             }
 
-            if (lowestButton != null) {
-                // Scroll into view
-                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", lowestButton);
-                Thread.sleep(1000);
+            // Select the given index (e.g., 3 → 3rd date)
+            WebElement selectedDate = dateButtons.get(index - 1);
 
-                // Try normal click first
-                try {
-                    wait.until(ExpectedConditions.elementToBeClickable(lowestButton));
-                    lowestButton.click();
-                } catch (Exception e) {
-                    // Fallback to JS click if normal click fails due to overlay
-                    ((JavascriptExecutor) driver).executeScript("arguments[0].click();", lowestButton);
-                }
+            // Get price *before clicking* to avoid stale element
+            String priceText = "";
+            try {
+                WebElement price = selectedDate.findElement(By.cssSelector("div.tmT\\+ZQ"));
+                priceText = price.getText();
+            } catch (Exception ignored) {}
 
-                System.out.println("✅ Clicked date with lowest fare: ₹" + lowestFare);
-            } else {
-                System.out.println("⚠️ No fare button found to click.");
+            // Scroll and click safely
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", selectedDate);
+            Thread.sleep(800);
+
+            try {
+                wait.until(ExpectedConditions.elementToBeClickable(selectedDate));
+                selectedDate.click();
+            } catch (Exception e) {
+                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", selectedDate);
             }
+
+            // Print confirmation after click
+            System.out.println("Selected date index " + index + (priceText.isEmpty() ? "" : " with fare: " + priceText));
 
         } catch (Exception e) {
-            System.out.println("⚠️ Error selecting lowest fare date: " + e.getMessage());
+            System.out.println("Failed to select date by index: " + e.getMessage());
         }
     }
-
-
 
     public void clickSearch() {
         try {
             WebElement searchBtn = wait.until(ExpectedConditions.elementToBeClickable(searchButton));
             searchBtn.click();
-            System.out.println("✅ Search button clicked.");
+            System.out.println("Search button clicked.");
         } catch (Exception e) {
-            System.out.println("⚠️ Failed to click Search: " + e.getMessage());
+            System.out.println(" Failed to click Search: " + e.getMessage());
         }
     }
-    public void printTopTwoFlights() {
+    public void printCheapestTwoFlights() {
         try {
-            // Wait for all flight cards to load
+            // Wait for flight cards to load
             wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(
-                    By.cssSelector("div.eivht0"))); // main container for each flight
+                    By.cssSelector("div.eivht0"))); // each flight block
 
             List<WebElement> flights = driver.findElements(By.cssSelector("div.eivht0"));
 
             if (flights.isEmpty()) {
-                System.out.println("⚠️ No flight results found!");
+                System.out.println("No flight results found!");
                 return;
             }
 
-            // Store each flight with its price
+            // Map flights with their prices
             List<Map.Entry<Integer, WebElement>> flightList = new ArrayList<>();
 
             for (WebElement flight : flights) {
                 try {
-                    // Extract price
                     WebElement priceEl = flight.findElement(By.cssSelector("div.O\\+irE2"));
                     String priceText = priceEl.getText().replaceAll("[^0-9]", "");
                     if (!priceText.isEmpty()) {
                         int price = Integer.parseInt(priceText);
                         flightList.add(Map.entry(price, flight));
                     }
-                } catch (Exception e) {
-                    // skip invalid ones
-                }
+                } catch (Exception ignored) {}
             }
 
             if (flightList.isEmpty()) {
-                System.out.println("⚠️ Could not find any valid flight prices!");
+                System.out.println("No valid flight prices found!");
                 return;
             }
 
-            // Sort by price ascending
+            // Sort by price (ascending)
             flightList.sort(Map.Entry.comparingByKey());
 
-            // Top 1st and 2nd flights
-            WebElement firstFlight = flightList.get(0).getValue();
-            WebElement secondFlight = flightList.size() > 1 ? flightList.get(1).getValue() : null;
+            WebElement cheapestFlight = flightList.get(0).getValue();
+            WebElement secondCheapestFlight = flightList.size() > 1 ? flightList.get(1).getValue() : null;
 
-            System.out.println("✈️ First Cheapest Flight:");
-            printFlightDetails(firstFlight);
+            System.out.println("Cheapest Flight:");
+            printFlightDetails(cheapestFlight);
 
-            if (secondFlight != null) {
-                System.out.println("\n✈️ Second Cheapest Flight:");
-                printFlightDetails(secondFlight);
+            if (secondCheapestFlight != null) {
+                System.out.println("\nSecond Cheapest Flight:");
+                printFlightDetails(secondCheapestFlight);
             } else {
-                System.out.println("\n⚠️ Only one flight result found.");
+                System.out.println("\n Only one flight result found.");
             }
 
         } catch (Exception e) {
-            System.out.println("⚠️ Error finding top two flights: " + e.getMessage());
+            System.out.println("Error fetching flight prices: " + e.getMessage());
         }
     }
 
-    // Helper: extract and print details of one flight
     private void printFlightDetails(WebElement flight) {
         try {
             String airline = flight.findElement(By.cssSelector("div.jvoo4s span")).getText();
@@ -198,9 +182,10 @@ public class FlightsPage {
             System.out.println("Price: " + price);
 
         } catch (Exception e) {
-            System.out.println("⚠️ Could not extract details for one flight: " + e.getMessage());
+            System.out.println("Could not extract flight details: " + e.getMessage());
         }
     }
+
 
 
 }
