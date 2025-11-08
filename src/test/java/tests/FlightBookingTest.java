@@ -26,10 +26,10 @@ public class FlightBookingTest extends BaseTest {
         flights.printCheapestTwoFlights();
 
 
-        // open Google in a new tab
+// open Google in a new tab
         ((JavascriptExecutor) driver).executeScript("window.open('https://www.google.com','_blank');");
 
-        //  Switch to new tab
+// Switch to new tab
         Set<String> handles = driver.getWindowHandles();
         Iterator<String> it = handles.iterator();
         String originalTab = it.next();
@@ -37,10 +37,14 @@ public class FlightBookingTest extends BaseTest {
         driver.switchTo().window(newTab);
 
         System.out.println("Opened Google successfully");
+
+        // Wait for page title
+        Thread.sleep(3000);
         System.out.println("Page Title: " + driver.getTitle());
 
         // Switch back to Flipkart Flights tab
         driver.switchTo().window(originalTab);
         System.out.println("Back to Flights page: " + driver.getTitle());
+
     }
 }
