@@ -106,3 +106,6 @@ Back to Flights page: Flight bookings, Cheap flights, Lowest Air tickets at Flip
 
 After fetching flight details,
 ➡️ the script opens Google in a new tab, prints its page title, and switches back to the Flipkart Flights tab — validating multi-tab session handling.
+
+👨‍💻 Author
+**Furqan Talha C**
