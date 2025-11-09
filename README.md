@@ -41,6 +41,8 @@ It demonstrates clean coding practices and modularity using **Page Object Model 
 selenium-flights-firefox/
 |
 src
+|
+test/java
 │
 ├── base/
 │ └── BaseTest.java # Common WebDriver setup and teardown
