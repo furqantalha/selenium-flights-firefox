@@ -21,7 +21,7 @@ public class FlightBookingTest extends BaseTest {
         home.goToFlights();
         flights.enterFromCity("Chennai");
         flights.enterToCity("Bangalore");
-        flights.selectDateByIndex(17);
+        flights.selectDateByIndex(2);
         flights.clickSearch();
         flights.printCheapestTwoFlights();
 

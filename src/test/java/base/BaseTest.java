@@ -18,7 +18,7 @@ public class BaseTest {
 
         FirefoxOptions options = new FirefoxOptions();
         // Set Firefox binary path manually
-        options.setBinary("C:\\Program Files\\Mozilla Firefox\\firefox.exe");
+            options.setBinary("C:\\Program Files\\Mozilla Firefox\\firefox.exe");
 
         driver = new FirefoxDriver(options);
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(15));

@@ -69,7 +69,7 @@ public class FlightsPage {
             Thread.sleep(1500);
 
             //  Collect all date buttons
-            List<WebElement> dateButtons = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("button.pl8ttv")));
+            List<WebElement> dateButtons = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.className("Yuvowl")));
 
             //  Validate index range
             if (index <= 0 || index > dateButtons.size()) {
@@ -118,10 +118,10 @@ public class FlightsPage {
     public void printCheapestTwoFlights() {
         try {
             // Wait for flight cards to load
-            wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(
-                    By.cssSelector("div.eivht0"))); // each flight block
-
-            List<WebElement> flights = driver.findElements(By.cssSelector("div.eivht0"));
+            List<WebElement> flights = new WebDriverWait(driver, Duration.ofSeconds(15))
+                    .until(ExpectedConditions.presenceOfAllElementsLocatedBy(
+                            By.cssSelector("div.Sjl9aT")
+                    ));
 
             if (flights.isEmpty()) {
                 System.out.println("No flight results found!");
@@ -133,7 +133,7 @@ public class FlightsPage {
 
             for (WebElement flight : flights) {
                 try {
-                    WebElement priceEl = flight.findElement(By.cssSelector("div.O\\+irE2"));
+                    WebElement priceEl = flight.findElement(By.cssSelector("div.TstEqy"));
                     String priceText = priceEl.getText().replaceAll("[^0-9]", "");
                     if (!priceText.isEmpty()) {
                         int price = Integer.parseInt(priceText);
@@ -147,7 +147,7 @@ public class FlightsPage {
                 return;
             }
 
-            // Sort by price (ascending)
+            // Sort by price ascending
             flightList.sort(Map.Entry.comparingByKey());
 
             WebElement cheapestFlight = flightList.get(0).getValue();
@@ -160,7 +160,7 @@ public class FlightsPage {
                 System.out.println("\nSecond Cheapest Flight:");
                 printFlightDetails(secondCheapestFlight);
             } else {
-                System.out.println("\n Only one flight result found.");
+                System.out.println("\nOnly one flight result found.");
             }
 
         } catch (Exception e) {
@@ -168,24 +168,24 @@ public class FlightsPage {
         }
     }
 
-    private void printFlightDetails(WebElement flight) {
+    public void printFlightDetails(WebElement flight) {
         try {
-            String airline = flight.findElement(By.cssSelector("div.jvoo4s span")).getText();
-            String flightCode = flight.findElement(By.cssSelector("div.jvoo4s span:nth-of-type(2)")).getText();
-            String departTime = flight.findElement(By.cssSelector("span.tMdhpV")).getText();
-            String arriveTime = flight.findElement(By.cssSelector("span.t3y8cp")).getText();
-            String price = flight.findElement(By.cssSelector("div.O\\+irE2")).getText();
+            String airline = flight.findElement(By.cssSelector("div.BIa_xg span:nth-of-type(1)")).getText();
+            String flightNo = flight.findElement(By.cssSelector("div.BIa_xg span:nth-of-type(2)")).getText();
 
-            System.out.println("Airline: " + airline + " " + flightCode);
-            System.out.println("Departure: " + departTime);
-            System.out.println("Arrival: " + arriveTime);
-            System.out.println("Price: " + price);
+            String departure = flight.findElement(By.cssSelector("span.e39CO_")).getText();
+            String arrival = flight.findElement(By.cssSelector("span.h8wxuH")).getText();
 
-        } catch (Exception e) {
+            String price = flight.findElement(By.cssSelector("div.TstEqy")).getText();
+
+            System.out.println("Airline    : " + airline);
+            System.out.println("Flight No  : " + flightNo);
+            System.out.println("Departure  : " + departure);
+            System.out.println("Arrival    : " + arrival);
+            System.out.println("Price      : " + price);
+
+        } catch (NoSuchElementException e) {
             System.out.println("Could not extract flight details: " + e.getMessage());
         }
     }
-
-
-
 }
