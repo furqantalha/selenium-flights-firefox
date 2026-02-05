@@ -1,4 +1,4 @@
-# ✈️ Selenium Flights Automation Framework (Infrrd QA Assignment)
+# ✈️ Selenium Flights Automation Framework 
 
 ## 📘 Problem Statement
 
